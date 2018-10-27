@@ -58,8 +58,8 @@ function returnCounter(number = 0) {
  Пример:
    returnArgumentsArray(1, 2, 3) вернет [1, 2, 3]
  */
-function returnArgumentsArray() {
-    return Array.from(arguments);
+function returnArgumentsArray(...args) {
+    return args;
 }
 
 /*
