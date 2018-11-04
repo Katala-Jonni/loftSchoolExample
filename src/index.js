@@ -111,22 +111,16 @@ function calculator(number = 0) {
     }
 
     return {
-        sum(...args) {
-            return args.reduce((initial, cur) => initial + cur, number);
-        },
-        dif(...args) {
-            return args.reduce((initial, cur) => initial - cur, number);
-        },
-        div(...args) {
+        sum: (...args) => args.reduce((initial, cur) => initial + cur, number),
+        dif: (...args) => args.reduce((initial, cur) => initial - cur, number),
+        div: (...args) => {
             if (args.some(el => el === 0)) {
                 throw ('division by 0');
             }
 
             return args.reduce((initial, cur) => initial / cur, number);
         },
-        mul(...args) {
-            return args.reduce((initial, cur) => initial * cur, number);
-        }
+        mul: (...args) => args.reduce((initial, cur) => initial * cur, number)
     }
 }
 
