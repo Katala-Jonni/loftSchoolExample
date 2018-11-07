@@ -61,7 +61,6 @@ function createDiv() {
    addListeners(newDiv);
  */
 function addListeners(target) {
-
     const minX = homeworkContainer.offsetLeft;
     const minY = homeworkContainer.offsetTop;
     let ind = false;
