@@ -167,7 +167,7 @@ function collectDOMStat(root) {
         classes: {},
         texts: 0
     };
-    const {tags, classes} = statistic;
+    const { tags, classes } = statistic;
     const changeTags = elem => tags[elem.tagName] ? tags[elem.tagName]++ : tags[elem.tagName] = 1;
     const changeClasses = elem => [...elem.classList].forEach(el => classes[el] ? classes[el]++ : classes[el] = 1);
     const changeTexts = () => statistic.texts++;
