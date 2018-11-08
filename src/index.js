@@ -1,0 +1,102 @@
+/* ДЗ 5 - DOM Events */
+
+/*
+ Задание 1:
+
+ Функция должна добавлять обработчик fn события eventName к элементу target
+
+ Пример:
+  // должна добавить указанный обработчик кликов на указанный элемент
+   addListener('click', document.querySelector('a'), () => console.log('...'))
+ */
+function addListener(eventName, target, fn) {
+    target.addEventListener(eventName, fn);
+}
+
+/*
+ Задание 2:
+
+ Функция должна удалять у элемента target обработчик fn события eventName
+
+ Пример:
+  // должна удалить указанный обработчик кликов на указанный элемент
+   removeListener('click', document.querySelector('a'), someHandler)
+ */
+function removeListener(eventName, target, fn) {
+    target.removeEventListener(eventName, fn);
+}
+
+/*
+ Задание 3:
+
+ Функция должна добавить к элементу target такой обработчик на события eventName, чтобы он отменял действия по умолчанию
+
+ Пример:
+  // после вызова функции, клики на указанную ссылку не должны приводить к переходу на другую страницу
+   skipDefault('click', document.querySelector('a'))
+ */
+function skipDefault(eventName, target) {
+    target.addEventListener(eventName, evt => evt.preventDefault());
+}
+
+/*
+ Задание 4:
+
+ Функция должна эмулировать событие click для элемента target
+
+ Пример:
+   emulateClick(document.querySelector('a')) // для указанного элемента должно быть сэмулировано события click
+ */
+function emulateClick(target) {
+    const options = {
+        bubbles: true,
+        cancelable: true
+    };
+    const event = new Event('click', options);
+
+    target.dispatchEvent(event);
+}
+
+/*
+ Задание 5:
+
+ Функция должна добавить такой обработчик кликов к элементу target,
+ который реагирует (вызывает fn) только на клики по элементам BUTTON внутри target
+
+ Пример:
+ // добавит такой обработчик кликов для body,
+ // который будет вызывать указанную функцию только если кликнули на кнопку (элемент с тегом button)
+   delegate(document.body, () => console.log('кликнули на button'))
+ */
+function delegate(target, fn) {
+    target.addEventListener('click', evt => evt.target.tagName === 'BUTTON' && fn());
+}
+
+/*
+ Задание 6:
+
+ Функция должна добавить такой обработчик кликов к элементу target,
+ который сработает только один раз и удалится (перестанет срабатывать для последующих кликов по указанному элементу)
+
+ Пример:
+  // добавит такой обработчик кликов для указанного элемента, который вызовется только один раз и затем удалится
+   once(document.querySelector('button'), () => console.log('обработчик выполнился!'))
+ */
+function once(target, fn) {
+    function handleClickAny() {
+        fn();
+        target.removeEventListener('click', handleClickAny);
+    }
+
+    target.addEventListener('click', handleClickAny);
+
+}
+
+export {
+    addListener,
+    removeListener,
+    skipDefault,
+    emulateClick,
+    delegate,
+    once
+};
