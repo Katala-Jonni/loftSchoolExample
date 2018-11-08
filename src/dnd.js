@@ -40,10 +40,11 @@ function createDiv() {
     div.style.width = `${size}px`;
     div.style.height = `${size}px`;
     div.style.backgroundColor = `rgb(${color.h}, ${color.s}, ${color.l})`;
-    div.style.cursor = 'pointer';
+    div.style.cursor = 'move';
     div.style.position = 'absolute';
-    div.style.left = `${getRandom(0, 1000 - size)}px`;
+    div.style.left = `${getRandom(0, 1250 - size)}px`;
     div.style.top = `${getRandom(0, 1000 - size)}px`;
+    div.style.borderRadius = `${getRandom(0, 100)}px`;
 
     function getRandom(max, min) {
         return Math.floor(Math.random() * (max - min) + min);
@@ -67,53 +68,57 @@ function addListeners(target) {
     let shiftX = 0;
     let shiftY = 0;
     let maxX, maxY;
+    const targetClassName = 'draggable-div';
+
+    const isTarget = elem => elem.classList.contains(targetClassName);
 
     function handleDownDiv(evt) {
         const targetElement = evt.target;
 
-        if (!targetElement.classList.contains('draggable-div')) {
+        if (!isTarget(targetElement)) {
             return;
         }
+        evt.preventDefault();
         ind = true;
-
-        const bounds = evt.target.getBoundingClientRect();
+        const bounds = targetElement.getBoundingClientRect();
 
         shiftX = evt.clientX - bounds.left;
         shiftY = evt.clientY - bounds.top;
 
         maxX = minX + homeworkContainer.offsetWidth - targetElement.offsetWidth;
         maxY = minY + homeworkContainer.offsetHeight - targetElement.offsetHeight;
-    }
 
-    function handleUpDiv(evt) {
-        if (!evt.target.classList.contains('draggable-div')) {
-            return
+        function handleUpDiv(evt) {
+            if (!isTarget(evt.target)) {
+                return;
+            }
+            ind = false;
         }
-        ind = false;
-    }
 
-    function handleMoveDiv(evt) {
-        if (!ind) {
-            return;
+        function handleMoveDiv(evt) {
+            if (!ind) {
+                return;
+            }
+            evt.preventDefault();
+
+            let x = evt.pageX - shiftX;
+            let y = evt.pageY - shiftY;
+
+            x = Math.min(x, maxX);
+            y = Math.min(y, maxY);
+
+            x = Math.max(x, minX);
+            y = Math.max(y, minY);
+
+            target.style.left = `${x}px`;
+            target.style.top = `${y}px`;
         }
-        evt.preventDefault();
 
-        let x = evt.pageX - shiftX;
-        let y = evt.pageY - shiftY;
-
-        x = Math.min(x, maxX);
-        y = Math.min(y, maxY);
-
-        x = Math.max(x, minX);
-        y = Math.max(y, minY);
-
-        target.style.left = `${x}px`;
-        target.style.top = `${y}px`;
+        document.addEventListener('mouseup', handleUpDiv);
+        document.addEventListener('mousemove', handleMoveDiv);
     }
 
-    homeworkContainer.addEventListener('mousedown', handleDownDiv);
-    homeworkContainer.addEventListener('mouseup', handleUpDiv);
-    homeworkContainer.addEventListener('mousemove', handleMoveDiv);
+    target.addEventListener('mousedown', handleDownDiv);
 }
 
 let addDivButton = homeworkContainer.querySelector('#addDiv');
@@ -123,6 +128,7 @@ addDivButton.addEventListener('click', function () {
     const div = createDiv();
 
     // добавить на страницу
+    homeworkContainer.style.height = '100vh';
     homeworkContainer.appendChild(div);
     // назначить обработчики событий мыши для реализации D&D
     addListeners(div);
