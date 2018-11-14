@@ -37,6 +37,46 @@ const homeworkContainer = document.querySelector('#homework-container');
  https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
  */
 function loadTowns() {
+    function sortString(a, b) {
+        if (a.name > b.name) {
+            return 1;
+        }
+        if (a.name < b.name) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    function createButton() {
+        const btn = document.createElement('button');
+
+        btn.type = 'button';
+        btn.textContent = 'Повторить';
+        btn.style.marginLeft = '10px';
+        btn.addEventListener('click', () => location.reload());
+
+        return btn;
+    }
+
+    function createErrorBlock() {
+        loadingBlock.style.display = 'block';
+        loadingBlock.textContent = 'Не удалось загрузить города';
+        loadingBlock.appendChild(createButton());
+    }
+
+    async function loadData() {
+        try {
+            const response = await fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json');
+            const parse = await response.json();
+
+            return parse.sort(sortString);
+        } catch (e) {
+            createErrorBlock();
+        }
+    }
+
+    return loadData();
 }
 
 /*
@@ -51,6 +91,7 @@ function loadTowns() {
    isMatching('Moscow', 'Moscov') // false
  */
 function isMatching(full, chunk) {
+    return full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1;
 }
 
 /* Блок с надписью "Загрузка" */
@@ -62,9 +103,69 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 
-filterInput.addEventListener('keyup', function() {
-    // это обработчик нажатия кливиш в текстовом поле
-});
+function showInput() {
+    loadingBlock.style.display = 'none';
+    filterBlock.style.display = 'block';
+}
+
+function clearFilterResult() {
+    filterResult.innerHTML = '';
+}
+
+let cities;
+
+loadTowns()
+    .then(res => {
+        if (!res) {
+            return;
+        }
+        showInput();
+        cities = res;
+    });
+
+// можно было и ul сделать с li
+function createParagraph() {
+    const p = document.createElement('p');
+
+    p.style.cursor = 'pointer';
+
+    return p;
+}
+
+function fillingFragment(cities) {
+    const fragment = document.createDocumentFragment();
+
+    cities.reduce((prev, cur) => {
+        const cloneParagraph = createParagraph().cloneNode();
+
+        cloneParagraph.textContent = cur.name;
+        prev.appendChild(cloneParagraph);
+
+        return prev;
+    }, fragment);
+
+    return fragment;
+}
+
+function handleVariableInput(e) {
+    clearFilterResult();
+    if (!e.target.value.length) {
+        return;
+    }
+    const filterCities = cities.filter(el => isMatching(el.name, e.target.value));
+
+    filterResult.appendChild(fillingFragment(filterCities));
+}
+
+function handleClickCity(e) {
+    if (e.target.tagName === 'P') {
+        filterInput.value = e.target.textContent;
+        clearFilterResult();
+    }
+}
+
+filterInput.addEventListener('keyup', handleVariableInput);
+filterResult.addEventListener('click', handleClickCity);
 
 export {
     loadTowns,
