@@ -45,88 +45,148 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('keyup', function () {
+function searchValue(box, val) {
+    return box.indexOf(val)
+}
+
+filterNameInput.addEventListener('keyup', function (e) {
     // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+    const cookies = getCookieObject();
+    const cookieNames = Object.keys(cookies);
+    const value = e.target.value;
+    const cookieNamesFilter = cookieNames.filter(el => {
+        if (searchValue(el, value) !== -1 || (searchValue(cookies[el], value) !== -1 && cookies[el] === value)) {
+            return el;
+        }
+    });
+    const fragment = getFragment(cookieNamesFilter, cookies);
+
+    // const fil = cookieNames.filter(el => cookies[el].toLowerCase() === value.toString().toLowerCase());
+    // console.log(fil);
+    // const fragment = getFragment(fil, cookies);
+
+    showCookie(fragment);
 });
 
-const row = document.createElement('tr');
-const col = document.createElement('td');
-const btn = document.createElement('button');
+function getCookieObject() {
+    return document.cookie
+        .split('; ')
+        .reduce((prev, cur) => {
+            const [name, value] = cur.split('=');
 
-btn.type = 'button';
-btn.textContent = 'X';
+            prev[name] = value;
 
-disabledButton();
+            return prev;
+        }, {});
+}
 
-function disabledButton(param = true) {
-    addButton.disabled = param;
+function createRow() {
+    return document.createElement('tr');
+}
+
+function createCol(value) {
+    const col = document.createElement('td');
+
+    col.textContent = value;
+
+    return col;
+}
+
+function createCollBtn() {
+    const td = createCol();
+    const btn = document.createElement('button');
+
+    btn.type = 'button';
+    btn.textContent = 'X';
+    btn.style.width = '50px';
+    btn.style.cursor = 'pointer';
+    btn.className = 'js-btn js-btn--delete';
+    td.appendChild(btn);
+
+    return td;
+}
+
+function createCookieDom(name, value) {
+    const row = createRow();
+    const collName = createCol(name);
+    const collValue = createCol(value);
+    const collBtn = createCollBtn();
+
+    collBtn.dataset.param = name;
+
+    function handleClickDelete(e) {
+        if (e.target.classList.contains('js-btn--delete')) {
+            deleteCookie(e.currentTarget.dataset.param);
+            row.parentElement.removeChild(row);
+        }
+    }
+
+    collBtn.addEventListener('click', handleClickDelete);
+    [collName, collValue, collBtn].forEach(el => row.appendChild(el));
+
+    return row;
+}
+
+function getFragment(keys, data) {
+    const fragment = document.createDocumentFragment();
+
+    keys.reduce((prev, cur) => {
+        cur && fragment.appendChild(createCookieDom(cur, data[cur]));
+
+        return fragment;
+    }, fragment);
+
+    return fragment;
+}
+
+function showCookie(fragment) {
+    listTable.innerHTML = '';
+    listTable.appendChild(fragment);
 }
 
 function isEmptyInput() {
     return [...addBlock].every(item => item.value.length);
 }
 
-block.addEventListener('input', () => disabledButton(!isEmptyInput()));
-
-function getCookieObject() {
-    const arr = document.cookie.split('; ');
-    const obj = {};
-    arr.reduce((prev, cur) => {
-        let [name, value] = cur.split('=');
-
-        obj[name] = value;
-    }, {});
-    return obj;
+function addCookie() {
+    document.cookie = `${addNameInput.value}=${addValueInput.value};`;
 }
 
-function createCol(value) {
-    const elem = col.cloneNode();
-
-    elem.textContent = value;
-
-    return elem;
+function deleteCookie(name) {
+    document.cookie = `${name}=; Expires=Thu, 01 Jan 1900 00:00:00 GMT';`;
 }
 
-function createBtn() {
-    return createCol().appendChild(btn.cloneNode(true));
-}
+createCookieData();
 
-function createRow() {
-    return row.cloneNode();
-}
-
-function createCookieDom(name, value) {
-    const cloneRow = createRow();
-    const cloneCollName = createCol(name);
-    const cloneCollValue = createCol(value);
-    const cloneCollBtn = createBtn();
-
-    cloneCollBtn.dataset.param = name;
-    cloneCollBtn.addEventListener('click', e => {
-        document.cookie = `${e.target.dataset.param}=; Expires=Thu, 01 Jan 1900 00:00:00 GMT';`;
-        cloneRow.parentElement.removeChild(cloneRow);
-    });
-
-    cloneRow.appendChild(cloneCollName);
-    cloneRow.appendChild(cloneCollValue);
-    cloneRow.appendChild(cloneCollBtn);
-
-    return cloneRow;
-}
-
-function showCookie() {
+function createCookieData() {
     const cookies = getCookieObject();
-    const cookieNames = Object.keys(cookies);
+    let cookieNames = Object.keys(cookies);
+    //
+    // if (filterNameInput.value.length && filterNameInput.value !== addValueInput.value) {
+    //     const data = cookieNames.find(el => cookies[el] === addValueInput.value);
+    //     cookieNames = cookieNames.filter(el => el !== data);
+    //     //console.log(data);
+    // }
+    // console.log(cookieNames);
+    const fragment = getFragment(cookieNames, cookies);
 
-    listTable.innerHTML = '';
-    cookieNames.forEach(el => el && listTable.appendChild(createCookieDom(el, cookies[el])));
+    showCookie(fragment);
+
+
 }
 
-showCookie();
+function handleClickAddButton() {
+    if (!isEmptyInput()) {
+        return null;
+    }
+    addCookie();
+    createCookieData();
+}
 
-addButton.addEventListener('click', () => {
-    document.cookie = `${addNameInput.value}=${addValueInput.value}`;
-    showCookie();
-    addNameInput.value = '';
-    addValueInput.value = '';
-});
+addButton.addEventListener('click', handleClickAddButton);
+
+function disabledButton(param = true) {
+    addButton.disabled = param;
+}
+
+//block.addEventListener('input', () => disabledButton(!isEmptyInput()));

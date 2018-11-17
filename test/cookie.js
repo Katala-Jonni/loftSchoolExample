@@ -1,4 +1,5 @@
 import assert from 'assert';
+
 let template = require('../src/cookie-content.hbs');
 
 function getCookies() {
@@ -189,6 +190,7 @@ describe('ДЗ 7.2 - Cookie editor', () => {
                 addButton.click();
 
                 cookies = getCookies();
+
                 assert(cookies.hasOwnProperty(addNameInput.value), 'должна быть добавлена в браузер');
                 assert.equal(cookies[addNameInput.value], addValueInput.value, 'должна быть добавлена в браузер');
                 assert.equal(listTable.children.length, 2, 'должна быть в таблице т.к. соответствует фильтру');
