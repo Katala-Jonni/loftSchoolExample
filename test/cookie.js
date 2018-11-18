@@ -183,6 +183,7 @@ describe('ДЗ 7.2 - Cookie editor', () => {
 
                 filterNameInput.value = 'value-2';
                 filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
+
                 assert.equal(listTable.children.length, 1);
 
                 addNameInput.value = 'test-cookie-name-3';
@@ -194,6 +195,7 @@ describe('ДЗ 7.2 - Cookie editor', () => {
                 assert(cookies.hasOwnProperty(addNameInput.value), 'должна быть добавлена в браузер');
                 assert.equal(cookies[addNameInput.value], addValueInput.value, 'должна быть добавлена в браузер');
                 assert.equal(listTable.children.length, 2, 'должна быть в таблице т.к. соответствует фильтру');
+
             });
 
             it('не добавлять cookie в таблицу, если значение cookie не соответствует фильтру', () => {

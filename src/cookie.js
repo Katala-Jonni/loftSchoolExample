@@ -45,29 +45,6 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-function searchValue(box, val) {
-    return box.indexOf(val)
-}
-
-filterNameInput.addEventListener('keyup', function (e) {
-    // здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
-    const cookies = getCookieObject();
-    const cookieNames = Object.keys(cookies);
-    const value = e.target.value;
-    const cookieNamesFilter = cookieNames.filter(el => {
-        if (searchValue(el, value) !== -1 || (searchValue(cookies[el], value) !== -1 && cookies[el] === value)) {
-            return el;
-        }
-    });
-    const fragment = getFragment(cookieNamesFilter, cookies);
-
-    // const fil = cookieNames.filter(el => cookies[el].toLowerCase() === value.toString().toLowerCase());
-    // console.log(fil);
-    // const fragment = getFragment(fil, cookies);
-
-    showCookie(fragment);
-});
-
 function getCookieObject() {
     return document.cookie
         .split('; ')
@@ -79,6 +56,33 @@ function getCookieObject() {
             return prev;
         }, {});
 }
+
+const cookies = getCookieObject();
+let cookieNames = getKeys(cookies);
+
+function showCookie(fragment) {
+    listTable.innerHTML = '';
+    listTable.appendChild(fragment);
+}
+
+function isEntryValue(box, val) {
+    return box.indexOf(val) !== -1;
+}
+
+function getKeys(obj) {
+    return Object.keys(obj);
+}
+
+function removeInvalidFilterValueDom(value) {
+    const cookies = getCookieObject();
+    const cookieNames = getKeys(cookies);
+    const namesFilter = cookieNames.filter(el => el && (isEntryValue(el, value) || isEntryValue(cookies[el], value)));
+
+    showCookie(getFragment(namesFilter, cookies));
+}
+
+// здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
+filterNameInput.addEventListener('keyup', e => removeInvalidFilterValueDom(e.target.value));
 
 function createRow() {
     return document.createElement('tr');
@@ -92,8 +96,7 @@ function createCol(value) {
     return col;
 }
 
-function createCollBtn() {
-    const td = createCol();
+function createButton() {
     const btn = document.createElement('button');
 
     btn.type = 'button';
@@ -101,7 +104,15 @@ function createCollBtn() {
     btn.style.width = '50px';
     btn.style.cursor = 'pointer';
     btn.className = 'js-btn js-btn--delete';
-    td.appendChild(btn);
+
+    return btn;
+}
+
+function createCollBtn(param) {
+    const td = createCol();
+
+    td.dataset.param = param;
+    td.appendChild(createButton());
 
     return td;
 }
@@ -110,19 +121,19 @@ function createCookieDom(name, value) {
     const row = createRow();
     const collName = createCol(name);
     const collValue = createCol(value);
-    const collBtn = createCollBtn();
+    const collBtn = createCollBtn(name);
+    const btnClass = 'js-btn--delete';
 
-    collBtn.dataset.param = name;
+    [collName, collValue, collBtn].forEach(el => row.appendChild(el));
 
-    function handleClickDelete(e) {
-        if (e.target.classList.contains('js-btn--delete')) {
+    function handleClickDeleteCookie(e) {
+        if (e.target.classList.contains(btnClass)) {
             deleteCookie(e.currentTarget.dataset.param);
             row.parentElement.removeChild(row);
         }
     }
 
-    collBtn.addEventListener('click', handleClickDelete);
-    [collName, collValue, collBtn].forEach(el => row.appendChild(el));
+    collBtn.addEventListener('click', handleClickDeleteCookie);
 
     return row;
 }
@@ -139,11 +150,6 @@ function getFragment(keys, data) {
     return fragment;
 }
 
-function showCookie(fragment) {
-    listTable.innerHTML = '';
-    listTable.appendChild(fragment);
-}
-
 function isEmptyInput() {
     return [...addBlock].every(item => item.value.length);
 }
@@ -156,23 +162,19 @@ function deleteCookie(name) {
     document.cookie = `${name}=; Expires=Thu, 01 Jan 1900 00:00:00 GMT';`;
 }
 
+function correspond() {
+    const data = cookieNames.find(el => cookies[el] === addValueInput.value);
+
+    cookieNames = cookieNames.filter(el => el !== data);
+
+    showCookie(getFragment(cookieNames, cookies));
+}
+
 createCookieData();
 
 function createCookieData() {
-    const cookies = getCookieObject();
-    let cookieNames = Object.keys(cookies);
-    //
-    // if (filterNameInput.value.length && filterNameInput.value !== addValueInput.value) {
-    //     const data = cookieNames.find(el => cookies[el] === addValueInput.value);
-    //     cookieNames = cookieNames.filter(el => el !== data);
-    //     //console.log(data);
-    // }
-    // console.log(cookieNames);
-    const fragment = getFragment(cookieNames, cookies);
-
-    showCookie(fragment);
-
-
+    isEntryValue(addValueInput.value, filterNameInput.value) && correspond();
+    filterNameInput.value === addValueInput.value && showCookie(getFragment(cookieNames, cookies));
 }
 
 function handleClickAddButton() {
@@ -181,6 +183,7 @@ function handleClickAddButton() {
     }
     addCookie();
     createCookieData();
+    removeInvalidFilterValueDom(filterNameInput.value);
 }
 
 addButton.addEventListener('click', handleClickAddButton);
@@ -189,4 +192,4 @@ function disabledButton(param = true) {
     addButton.disabled = param;
 }
 
-//block.addEventListener('input', () => disabledButton(!isEmptyInput()));
+block.addEventListener('input', () => disabledButton(!isEmptyInput()));
