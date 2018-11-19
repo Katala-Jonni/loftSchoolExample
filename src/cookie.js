@@ -31,8 +31,7 @@
    const newDiv = document.createElement('div');
    homeworkContainer.appendChild(newDiv);
  */
-const addBlock = document.querySelectorAll('#add-block input');
-const block = document.querySelector('#add-block');
+
 const homeworkContainer = document.querySelector('#homework-container');
 // текстовое поле для фильтрации cookie
 const filterNameInput = homeworkContainer.querySelector('#filter-name-input');
@@ -151,7 +150,7 @@ function getFragment(keys, data) {
 }
 
 function isEmptyInput() {
-    return [...addBlock].every(item => item.value.length);
+    return [addNameInput, addValueInput].every(item => item.value.length);
 }
 
 function addCookie() {
@@ -187,9 +186,3 @@ function handleClickAddButton() {
 }
 
 addButton.addEventListener('click', handleClickAddButton);
-
-function disabledButton(param = true) {
-    addButton.disabled = param;
-}
-
-block.addEventListener('input', () => disabledButton(!isEmptyInput()));
