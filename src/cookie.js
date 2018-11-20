@@ -31,7 +31,6 @@
    const newDiv = document.createElement('div');
    homeworkContainer.appendChild(newDiv);
  */
-
 const homeworkContainer = document.querySelector('#homework-container');
 // текстовое поле для фильтрации cookie
 const filterNameInput = homeworkContainer.querySelector('#filter-name-input');
@@ -56,38 +55,11 @@ function getCookieObject() {
         }, {});
 }
 
-const cookies = getCookieObject();
-let cookieNames = getKeys(cookies);
-
-function showCookie(fragment) {
-    listTable.innerHTML = '';
-    listTable.appendChild(fragment);
-}
-
 function isEntryValue(box, val) {
-    return box.indexOf(val) !== -1;
+    return box.toLowerCase().indexOf(val.toLowerCase()) !== -1;
 }
 
-function getKeys(obj) {
-    return Object.keys(obj);
-}
-
-function removeInvalidFilterValueDom(value) {
-    const cookies = getCookieObject();
-    const cookieNames = getKeys(cookies);
-    const namesFilter = cookieNames.filter(el => el && (isEntryValue(el, value) || isEntryValue(cookies[el], value)));
-
-    showCookie(getFragment(namesFilter, cookies));
-}
-
-// здесь можно обработать нажатия на клавиши внутри текстового поля для фильтрации cookie
-filterNameInput.addEventListener('keyup', e => removeInvalidFilterValueDom(e.target.value));
-
-function createRow() {
-    return document.createElement('tr');
-}
-
-function createCol(value) {
+function createCol(value = '') {
     const col = document.createElement('td');
 
     col.textContent = value;
@@ -117,7 +89,7 @@ function createCollBtn(param) {
 }
 
 function createCookieDom(name, value) {
-    const row = createRow();
+    const row = document.createElement('tr');
     const collName = createCol(name);
     const collValue = createCol(value);
     const collBtn = createCollBtn(name);
@@ -127,7 +99,7 @@ function createCookieDom(name, value) {
 
     function handleClickDeleteCookie(e) {
         if (e.target.classList.contains(btnClass)) {
-            deleteCookie(e.currentTarget.dataset.param);
+            document.cookie = `${e.currentTarget.dataset.param}=; Expires=Thu, 01 Jan 1900 00:00:00 GMT';`;
             row.parentElement.removeChild(row);
         }
     }
@@ -137,7 +109,7 @@ function createCookieDom(name, value) {
     return row;
 }
 
-function getFragment(keys, data) {
+function createBodyTable(keys, data) {
     const fragment = document.createDocumentFragment();
 
     keys.reduce((prev, cur) => {
@@ -146,43 +118,30 @@ function getFragment(keys, data) {
         return fragment;
     }, fragment);
 
-    return fragment;
+    listTable.innerHTML = '';
+    listTable.appendChild(fragment);
 }
 
 function isEmptyInput() {
     return [addNameInput, addValueInput].every(item => item.value.length);
 }
 
-function addCookie() {
-    document.cookie = `${addNameInput.value}=${addValueInput.value};`;
-}
+function removeInvalidFilterValueDom(value) {
+    const cookies = getCookieObject();
+    const cookieNames = Object.keys(cookies);
+    const namesFilter = cookieNames.filter(el => el && (isEntryValue(el, value) || isEntryValue(cookies[el], value)));
 
-function deleteCookie(name) {
-    document.cookie = `${name}=; Expires=Thu, 01 Jan 1900 00:00:00 GMT';`;
-}
-
-function correspond() {
-    const data = cookieNames.find(el => cookies[el] === addValueInput.value);
-
-    cookieNames = cookieNames.filter(el => el !== data);
-
-    showCookie(getFragment(cookieNames, cookies));
-}
-
-createCookieData();
-
-function createCookieData() {
-    isEntryValue(addValueInput.value, filterNameInput.value) && correspond();
-    filterNameInput.value === addValueInput.value && showCookie(getFragment(cookieNames, cookies));
+    createBodyTable(namesFilter, cookies);
 }
 
 function handleClickAddButton() {
     if (!isEmptyInput()) {
         return null;
     }
-    addCookie();
-    createCookieData();
+    document.cookie = `${addNameInput.value}=${addValueInput.value};`;
     removeInvalidFilterValueDom(filterNameInput.value);
 }
 
 addButton.addEventListener('click', handleClickAddButton);
+
+filterNameInput.addEventListener('keyup', e => removeInvalidFilterValueDom(e.target.value));
