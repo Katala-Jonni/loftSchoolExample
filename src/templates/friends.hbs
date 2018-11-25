@@ -1,0 +1,7 @@
+{{#each items}}
+    <li class="friends__item friend js-drag" draggable="true" data-type="{{type}}" data-id="{{id}}" data-name="{{first_name}}" data-lastname="{{last_name}}" data-img="{{photo_50}}">
+        <img class="friend__img" src="{{photo_50}}" alt="{{first_name}} {{last_name}}" width="45" height="45">
+        <span class="friend__name">{{first_name}} {{last_name}}</span>
+        <button class="friend__btn btn btn--{{type}} js-move"></button>
+    </li>
+{{/each}}
