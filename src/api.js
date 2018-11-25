@@ -1,9 +1,14 @@
-const enter = document.querySelector('.js-enter');
-const friends = document.querySelector('.js-friends');
-const hiddenClass = 'visually-hidden';
+import util from './util';
 
+const { enter, friends, hiddenClass } = util;
 
-function apiAuth() {
+export function init() {
+    VK.init({
+        apiId: 6761649
+    });
+}
+
+export function auth() {
     return new Promise((resolve, reject) => {
         VK.Auth.login(data => {
             if (data.session) {
@@ -16,7 +21,7 @@ function apiAuth() {
     });
 }
 
-function responseApi(method, params) {
+export function getFriends(method, params) {
     params.v = '5.76';
 
     return new Promise((resolve, reject) => {
@@ -24,7 +29,7 @@ function responseApi(method, params) {
     });
 }
 
-function handleClickLogOut() {
+export function handleClickLogOut() {
     VK.Auth.logout(data => {
         if (!data.session) {
             friends.classList.add(hiddenClass);
@@ -34,9 +39,3 @@ function handleClickLogOut() {
 }
 
 VK.UI.button(enter);
-
-export default {
-    auth: apiAuth,
-    getFriends: responseApi,
-    logOut: handleClickLogOut,
-}
