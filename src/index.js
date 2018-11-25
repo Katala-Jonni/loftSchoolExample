@@ -33,7 +33,7 @@ async function handleClickEnter() {
     try {
         await auth();
         sections.forEach(el => el.classList.add(hiddenClass));
-        const list = await getFriends('friends.get', { fields: 'photo_50' });
+        const list = await getFriends('friends.get', { fields: 'photo_50', count: 2000 });
         const items = list.items.filter(el => el.type = 'total');
 
         handleBarsRender(total, items, true);

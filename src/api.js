@@ -1,6 +1,6 @@
 import util from './util';
 
-const { enter, friends, hiddenClass } = util;
+const { enter, friends, hiddenClass, loader } = util;
 
 export function init() {
     VK.init({
@@ -34,6 +34,7 @@ export function handleClickLogOut() {
         if (!data.session) {
             friends.classList.add(hiddenClass);
             enter.classList.remove(hiddenClass);
+            loader.classList.remove(hiddenClass);
         }
     });
 }
