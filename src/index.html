@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Примеры. Позиционирование карты для показа результатов геокодирования и их кластеризация.</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!--
+        Укажите свой API-ключ. Тестовый ключ НЕ БУДЕТ работать на других сайтах.
+        Получить ключ можно в Кабинете разработчика: https://developer.tech.yandex.ru/keys/
+    -->
+    <link rel="stylesheet" href="./style/index.css">
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<!--
+<script>
+    ymaps.ready(init);
+    var myMap;
+
+    function init () {
+        myMap = new ymaps.Map("map", {
+            center: [57.5262, 38.3061], // Углич
+            zoom: 11
+        }, {
+            balloonMaxWidth: 200,
+            searchControlProvider: 'yandex#search'
+        });
+
+        // Обработка события, возникающего при щелчке
+        // левой кнопкой мыши в любой точке карты.
+        // При возникновении такого события откроем балун.
+        myMap.events.add('click', function (e) {
+            if (!myMap.balloon.isOpen()) {
+                var coords = e.get('coords');
+                myMap.balloon.open(coords, {
+                    contentHeader:coords,
+                    contentBody:'<p>Кто-то щелкнул по карте.</p>' +
+                    '<p>Координаты щелчка: ' + [
+                        coords[0].toPrecision(6),
+                        coords[1].toPrecision(6)
+                    ].join(', ') + '</p>',
+                    contentFooter:'<sup>Щелкните еще раз</sup>'
+                });
+            }
+            else {
+                myMap.balloon.close();
+            }
+        });
+
+        // Обработка события, возникающего при щелчке
+        // правой кнопки мыши в любой точке карты.
+        // При возникновении такого события покажем всплывающую подсказку
+        // в точке щелчка.
+        myMap.events.add('contextmenu', function (e) {
+            myMap.hint.open(e.get('coords'), 'Кто-то щелкнул правой кнопкой');
+        });
+
+        // Скрываем хинт при открытии балуна.
+        myMap.events.add('balloonopen', function (e) {
+            myMap.hint.close();
+        });
+    }
+</script>
+-->
+<!--
+<script>
+ymaps.ready(function () {
+    var myMap = new ymaps.Map('map', {
+            center: [55.751574, 37.573856],
+            zoom: 9
+        }, {
+            searchControlProvider: 'yandex#search'
+        }),
+
+        // Создаём макет содержимого.
+        MyIconContentLayout = ymaps.templateLayoutFactory.createClass(
+            '<div style="color: #FFFFFF; font-weight: bold;">$[properties.iconContent]</div>'
+        ),
+
+        myPlacemark = new ymaps.Placemark(myMap.getCenter(), {
+            hintContent: 'Собственный значок метки',
+            balloonContent: 'Это красивая метка'
+        }, {
+            // Опции.
+            // Необходимо указать данный тип макета.
+            iconLayout: 'default#image',
+            // Своё изображение иконки метки.
+            iconImageHref: 'images/pin.png',
+            // Размеры метки.
+            iconImageSize: [44, 66],
+            // Смещение левого верхнего угла иконки относительно
+            // её "ножки" (точки привязки).
+            iconImageOffset: [-5, -38]
+        }),
+
+        myPlacemarkWithContent = new ymaps.Placemark([55.661574, 37.573856], {
+            hintContent: 'Собственный значок метки с контентом',
+            balloonContent: 'А эта — новогодняя',
+            iconContent: '12'
+        }, {
+            // Опции.
+            // Необходимо указать данный тип макета.
+            iconLayout: 'default#imageWithContent',
+            // Своё изображение иконки метки.
+            iconImageHref: 'images/pin.png',
+            // Размеры метки.
+            iconImageSize: [44, 66],
+            // Смещение левого верхнего угла иконки относительно
+            // её "ножки" (точки привязки).
+            iconImageOffset: [-24, -24],
+            // Смещение слоя с содержимым относительно слоя с картинкой.
+            iconContentOffset: [15, 15],
+            // Макет содержимого.
+            iconContentLayout: MyIconContentLayout
+        });
+
+    myMap.events.add('click', function (e) {
+        // Получение координат щелчка
+        var coords = e.get('target');
+        console.log(coords);
+    });
+
+    myMap.geoObjects
+        .add(myPlacemark)
+        .add(myPlacemarkWithContent);
+});
+</script>
+-->
+</body>
+</body>
+
+</html>
