@@ -1,42 +1,41 @@
-import util from './util';
+class VkApi {
+    auth(appId, perms) {
+        return new Promise((resolve, reject) => {
+            VK.init({
+                apiId: appId
+            });
+            VK.Auth.login(data => {
+                if (data.session) {
+                    resolve(data)
+                }
+                reject(new Error('Ошибка Авторизации'));
+            }, perms);
+        });
+    }
 
-const { enter, friends, hiddenClass, loader } = util;
+    callApi(method, params = {}) {
+        params.v = '5.76';
 
-export function init() {
-    VK.init({
-        apiId: 6761649
-    });
+        return new Promise((resolve, reject) => {
+            VK.api(method, params, data => data.error ? reject(data.error) : resolve(data.response));
+        });
+    }
+
+    logOut() {
+        return new Promise((resolve, reject) => {
+            VK.Auth.logout(data => {
+                !data.session ? resolve() : reject(new Error('Не удалось выйти'))
+            })
+        })
+    }
+
+    createButtonVk(id) {
+        VK.UI.button(id);
+    }
+
+    getFriends(method, params = {}) {
+        return this.callApi(method, params);
+    }
 }
 
-export function auth() {
-    return new Promise((resolve, reject) => {
-        VK.Auth.login(data => {
-            if (data.session) {
-                resolve();
-                friends.classList.remove(hiddenClass);
-                enter.classList.add(hiddenClass);
-            }
-            reject(new Error('Не удалось авторизоваться'));
-        }, 2);
-    });
-}
-
-export function getFriends(method, params) {
-    params.v = '5.76';
-
-    return new Promise((resolve, reject) => {
-        VK.api(method, params, data => data.error ? reject(data.error) : resolve(data.response));
-    });
-}
-
-export function handleClickLogOut() {
-    VK.Auth.logout(data => {
-        if (!data.session) {
-            friends.classList.add(hiddenClass);
-            enter.classList.remove(hiddenClass);
-            loader.classList.remove(hiddenClass);
-        }
-    });
-}
-
-VK.UI.button(enter);
+export default VkApi;

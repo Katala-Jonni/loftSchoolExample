@@ -1,14 +1,19 @@
 import './style/index.css';
 import render from './templates/friends.hbs';
 import util from './util';
-import { init, auth, getFriends, handleClickLogOut } from './api';
+import VkApi from './api';
 import { changeSearchFilter } from './filter';
 import Storage from './storage';
 
-const { closeBtn, saveStorage, enter, hiddenClass, select, total, sections, loader, currentType } = util;
+const { friends, closeBtn, saveStorage, enter, hiddenClass, select, total, sections, loader, currentType } = util;
 
 // инициализация api vk
-init();
+const appId = 6761649;
+const perms = 2;
+const api = new VkApi();
+const { auth, getFriends, createButtonVk, logOut } = api;
+
+createButtonVk(enter);
 const storage = new Storage();
 
 export function handleBarsRender(box, elements, isStartRender = false) {
@@ -31,9 +36,11 @@ export function handleBarsRender(box, elements, isStartRender = false) {
 
 async function handleClickEnter() {
     try {
-        await auth();
+        await auth(appId, perms);
+        friends.classList.remove(hiddenClass);
+        enter.classList.add(hiddenClass);
         sections.forEach(el => el.classList.add(hiddenClass));
-        const list = await getFriends('friends.get', { fields: 'photo_50', count: 2000 });
+        const list = await getFriends.call(api, 'friends.get', { fields: 'photo_50', count: 2000 });
         const items = list.items.filter(el => el.type = 'total');
 
         handleBarsRender(total, items, true);
@@ -53,4 +60,13 @@ function handleClickSaveStorage(e) {
 
 enter.addEventListener('click', handleClickEnter); // вход
 saveStorage.addEventListener('click', handleClickSaveStorage); // storage
-closeBtn.addEventListener('click', handleClickLogOut); // выход
+closeBtn.addEventListener('click', async () => {
+    try {
+        await logOut();
+        friends.classList.add(hiddenClass);
+        enter.classList.remove(hiddenClass);
+        loader.classList.remove(hiddenClass);
+    } catch (e) {
+        return null;
+    }
+}); // выход
