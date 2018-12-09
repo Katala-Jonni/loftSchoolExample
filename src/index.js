@@ -1,33 +1,37 @@
-/* ДЗ 6 - Асинхронность и работа с сетью */
+import './style/index.css';
+import Map from './Map';
 
-/*
- Задание 1:
+const myMap = new Map(document.querySelector('.js-comment'));
 
- Функция должна возвращать Promise, который должен быть разрешен через указанное количество секунду
+ymaps.ready(init);
 
- Пример:
-   delayPromise(3) // вернет promise, который будет разрешен через 3 секунды
- */
-function delayPromise(seconds) {
+function init() {
+    // инициализация
+    myMap.init();
+    myMap.map.events.add('click', async e => {
+        const coords = e.get('coords');
+        const pos = e.get('position');
+        const res = await ymaps.geocode(coords);
+
+        myMap.changePopUp(myMap.map, pos[0], pos[1], coords, res.geoObjects.get(0).getAddressLine(), true);
+    });
+    myMap.clusterer.events.add(['mousedown'], () => myMap.comment.classList.add('visually-hidden'));
+    myMap.map.geoObjects.add(myMap.clusterer);
+    document.addEventListener('click', e => {
+        e.preventDefault();
+        e.target.classList.contains('js-add-comment') && myMap.createBalloonAndPlaceMark(e);
+        e.target.classList.contains('js-close') && myMap.createParent(e.target).classList.add('visually-hidden');
+        if (e.target.classList.contains('js-claster-link')) {
+            const coords = e.target.dataset.id.split(',');
+            myMap.changePopUp(myMap.map, e.clientX, e.clientY, coords, e.target.textContent);
+            myMap.addView(coords.join(''));
+        }
+    });
+    document.addEventListener('keyup', e => {
+        if (e.key === 'Escape') {
+            const comment = document.querySelector('.js-comment');
+            comment.classList.add('visually-hidden');
+            myMap.map.balloon.close();
+        }
+    });
 }
-
-/*
- Задание 2:
-
- 2.1: Функция должна вернуть Promise, который должен быть разрешен с массивом городов в качестве значения
-
- Массив городов пожно получить отправив асинхронный запрос по адресу
- https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
-
- 2.2: Элементы полученного массива должны быть отсортированы по имени города
-
- Пример:
-   loadAndSortTowns().then(towns => console.log(towns)) // должна вывести в консоль отсортированный массив городов
- */
-function loadAndSortTowns() {
-}
-
-export {
-    delayPromise,
-    loadAndSortTowns
-};

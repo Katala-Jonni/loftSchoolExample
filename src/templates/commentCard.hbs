@@ -1,0 +1,41 @@
+<section class="comment js-comment">
+    <h1 class="visually-hidden">Геотзыв</h1>
+    <div class="arrow"></div>
+    <header class="comment__header">
+        <div class="comment__header-cont container">
+            <h2 class="comment__subtitle">{{header}}</h2>
+            <button class="btn btn--close js-close close" aria-label="закрыть"></button>
+        </div>
+    </header>
+    <section class="comment__content js-section">
+        <h2 class="visually-hidden">Карточка Геотзыва</h2>
+        <div class="container">
+            <ul class="comment__list js-comment-list">
+                <li class="comment__item js-first-comment first">
+                    <p class="comment__message">Отзывов пока нет...</p>
+                </li>
+            </ul>
+        </div>
+    </section>
+    <section class="comment__inputs js-section">
+        <div class="comment__inputs-cont container">
+            <h2 class="comment__inputs-title">Ваш отзыв</h2>
+            <form class="comment__form form js-comment-form">
+                <div class="form__box">
+                    <input class="form__input js-input" name="name" type="text" placeholder="Ваше имя"
+                           data-binding=name">
+                </div>
+                <div class="form__box">
+                    <input class="form__input js-input" name="place" type="text" placeholder="Укажите место"
+                           data-binding=place">
+                </div>
+                <div class="form__box">
+                    <textarea class="form__input form__input--textarea js-input" name="message"
+                              placeholder="Поделитесь впечатлениями"
+                              data-binding=message" cols="10" rows="4"></textarea>
+                </div>
+                <button class="form-btn js-add-baloon" id="form-btn" type="button">Добавить</button>
+            </form>
+        </div>
+    </section>
+</section>

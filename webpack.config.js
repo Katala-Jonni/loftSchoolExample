@@ -38,7 +38,7 @@ const html = files['.hbs']
 
 if (!html.length || !files['.hbs'].find(file => file.name === 'index')) {
     html.push(new HtmlPlugin({
-        title: 'index',
+        title: 'Friends',
         template: 'index.hbs',
         chunks: ['index']
     }));
@@ -66,7 +66,7 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: '[name].css',
+            filename: '[name].[hash].css',
         }),
         ...html,
         new CleanWebpackPlugin(['dist'])

@@ -1,0 +1,9 @@
+{{#each this}}
+    <li class="comment__item">
+        <div class="comment__box">
+            <h3 class="comment__name" data-binding="name">{{name}}</h3>
+            <p class="comment__place" data-binding="place">{{place}} {{date}}</p>
+        </div>
+        <p class="comment__message" data-binding="message">{{message}}</p>
+    </li>
+{{/each}}
